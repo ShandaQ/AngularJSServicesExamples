@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Factory</title>
+    <script src="angular.js"></script>
+    <script>
+    var app = angular.module('app', []);
+
+    // weatherService
+    app.factory('weatherService', function($http){
+      APPID = 'eac2948bfca65b78a8c5564ecf91d00e';
+      return{
+        cityNameMethod: function(cityName, callback){
+          $http({
+            url: 'http://api.openweathermap.org/data/2.5/weather',
+            params: {
+              q: cityName,
+              units: 'imperial',
+              APPID: APPID
+            } //end params
+
+         }).success(callback); // end $http
+           //data is ready here
+          //  .success(function(data){
+          //    callback(data);
+          //  })
+       } // end cityNameMethod
+     }; // end return
+   }); // end weatherService
+
+    app.controller('MainController', function($scope, $http, weatherService) {
+      $scope.showWeather = function() {
+        weatherService.cityNameMethod($scope.cityName, function(data){
+          $scope.data = data;
+        });
+      };
+    });
+    </script>
+  </head>
+  <body ng-app="app" ng-controller="MainController">
+    <form ng-submit="showWeather()">
+      <input type="text" ng-model="cityName">
+      <button type="submit">Submit</button>
+    </form>
+    <p ng-show="data">
+      City: {{data.name}}<br>
+      Weather: {{data.weather[0].description}}<br>
+      Latitude: {{data.coord.lat}}°<br>
+      Longitude: {{data.coord.lon}}°<br>
+      Temperature: {{data.main.temp}}°<br>
+      Humidity: {{data.main.humidity}}<br>
+      Pressure: {{data.main.pressure}}<br>
+    </p>
+  </body>
+</html>
